@@ -43,11 +43,18 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.18
   webview_flutter: ^4.4.2
   path_provider: ^2.1.1
+  file_picker: ^6.2.0
+  syncfusion_flutter_datagrid: ^25.1.35
+  datetime_picker_formfield_new: ^2.1.0
+  image_picker: ^1.0.7
+  video_player: ^2.8.3
+#  flutter_localization: ^0.19.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: "^0.13.1"
+  intl: ^0.19.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -1,3 +1,4 @@
+import 'package:devtest01/screen/DataGrid.dart';
 import 'package:devtest01/webview/webviewIndex.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -5,7 +6,10 @@ import '../Icon/MyFlutterApp.dart';
 import '../model/login_model.dart';
 import '../service/login_database_helper.dart';
 import '../webview/webviewexample.dart';
+import 'ImagePickerDemo.dart';
+import 'ImagePickerDemo1.dart';
 import 'IndexScreen.dart';
+import 'JsonDataGrid.dart';
 import 'LoginScreen.dart';
 
 class HomeScreen1 extends StatelessWidget {
@@ -118,12 +122,16 @@ class GridBuilderState extends State<GridBuilder> {
       children: <Widget>[
         InkWell(
           onTap: () {
-            Navigator.push(context,
+            Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (BuildContext context) {
-                  return  WebViewIndex(
-                    url: "http://211.20.21.35:8080/fjuheart/MH200101/index",
-                  );
-            }));
+                  return   JsonDataGrid(Measure_s: '', Measure_e: '');
+                }));
+            // Navigator.push(context,
+            //     MaterialPageRoute(builder: (BuildContext context) {
+            //       return  WebViewIndex(
+            //         url: "http://211.20.21.35:8080/fjuheart/MH200101/index",
+            //       );
+            // }));
           },
           child: Ink.image(
               width: 300,
@@ -137,7 +145,7 @@ class GridBuilderState extends State<GridBuilder> {
           children: [
             InkWell(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return  WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200102/index",
@@ -153,7 +161,7 @@ class GridBuilderState extends State<GridBuilder> {
             ),
             InkWell(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return  WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200103/index",
@@ -169,7 +177,7 @@ class GridBuilderState extends State<GridBuilder> {
             ),
             InkWell(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return  WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200104/index",
@@ -190,7 +198,7 @@ class GridBuilderState extends State<GridBuilder> {
           children: [
             InkWell(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return  WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200105/index",
@@ -206,7 +214,7 @@ class GridBuilderState extends State<GridBuilder> {
             ),
             InkWell(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return  WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200106/index",
@@ -224,7 +232,7 @@ class GridBuilderState extends State<GridBuilder> {
         ),
         InkWell(
           onTap: () {
-            Navigator.push(context,
+            Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (BuildContext context) {
                   return  WebViewIndex(
                     url: "http://211.20.21.35:8080/fjuheart/MH200110/index",
@@ -238,40 +246,57 @@ class GridBuilderState extends State<GridBuilder> {
                 'http://211.20.21.35:8080/fjuheart/resources/images/btn15.png',
               )),
         ),
-        //  Image.asset(
-        //   'images/lake.jpg',
-        //   width: 600,
-        //   height: 240,
-        //   //cover(充满容器)、fill（充满父容器）、contain（总有宽或高跟父一样）、none(原图居中显示)、fitWidth（宽度跟父一样）、fitHeight（高度跟父一样）
-        //   fit: BoxFit.contain,
+        // InkWell(
+        //   onTap: () {
+        //     Navigator.pushReplacement(context,
+        //         MaterialPageRoute(builder: (BuildContext context) {
+        //           return   JsonDataGrid(Measure_s: '', Measure_e: '');
+        //         }));
+        //     // Navigator.push(context,
+        //     //     MaterialPageRoute(builder: (BuildContext context) {
+        //     //       return  WebViewIndex(
+        //     //         url: "http://211.20.21.35:8080/fjuheart/MH200110/index",
+        //     //       );
+        //     //     }));
+        //   },
+        //   child: Ink.image(
+        //       width: 300,
+        //       height: 150,
+        //       image: const NetworkImage(
+        //         'http://211.20.21.35:8080/fjuheart/resources/images/btn14.png',
+        //       )),
         // ),
-        // TextSection(),
-        // LoginButton(),
-        // ForgetButton()
+        // InkWell(
+        //   onTap: () {
+        //     Navigator.push(context,
+        //         MaterialPageRoute(builder: (BuildContext context) {
+        //           return   const ImagePickerDemo();
+        //         }));
+        //   },
+        //   child: Ink.image(
+        //       width: 300,
+        //       height: 150,
+        //       image: const NetworkImage(
+        //         'http://211.20.21.35:8080/fjuheart/resources/images/btn13.png',
+        //       )),
+        // ),
+        // InkWell(
+        //   onTap: () {
+        //     Navigator.push(context,
+        //         MaterialPageRoute(builder: (BuildContext context) {
+        //           return  ImagePickerDemo1(title: 'Flutter Image Upload Demo',);
+        //         }));
+        //   },
+        //   child: Ink.image(
+        //       width: 300,
+        //       height: 150,
+        //       image: const NetworkImage(
+        //         // 'http://localhost:8080/devmvc/resources/images/btn12.png',
+        //         'http://211.20.21.35:8080/fjuheart/resources/images/btn12.png',
+        //       )),
+        // ),
       ],
     );
-    // return ListView.builder(
-    //     itemCount: widget.selectedList.length,
-    //     itemBuilder: (_, int index) {
-    //       return ListTile(
-    //           onTap: () => _toggle(index),
-    //           onLongPress: () {
-    //             if (!widget.isSelectionMode) {
-    //               setState(() {
-    //                 widget.selectedList[index] = true;
-    //               });
-    //               widget.onSelectionChange!(true);
-    //             }
-    //           },
-    //           trailing: widget.isSelectionMode
-    //               ? Checkbox(
-    //             value: widget.selectedList[index],
-    //             onChanged: (bool? x) => _toggle(index),
-    //           )
-    //               : const SizedBox.shrink(),
-    //           title: Text('item $index')
-    //       );
-    //     });
   }
 }
 
@@ -307,13 +332,16 @@ class _ListBuilderState extends State<ListBuilder> {
         SizedBox(
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200101/index",
-                      );
-
+                      return   JsonDataGrid(Measure_s: '', Measure_e: '');
                     }));
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (BuildContext context) {
+                //       return WebViewIndex(
+                //         url: "http://211.20.21.35:8080/fjuheart/MH200101/index",
+                //       );
+                //     }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -332,7 +360,7 @@ class _ListBuilderState extends State<ListBuilder> {
           // color: Colors.amber[500],
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200102/index",
@@ -354,7 +382,7 @@ class _ListBuilderState extends State<ListBuilder> {
         SizedBox(
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200103/index",
@@ -378,7 +406,7 @@ class _ListBuilderState extends State<ListBuilder> {
           // color: Colors.amber[100],
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200104/index",
@@ -402,7 +430,7 @@ class _ListBuilderState extends State<ListBuilder> {
           // color: Colors.amber[100],
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200105/index",
@@ -426,7 +454,7 @@ class _ListBuilderState extends State<ListBuilder> {
           // color: Colors.amber[100],
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200106/index",
@@ -450,7 +478,7 @@ class _ListBuilderState extends State<ListBuilder> {
           // color: Colors.amber[100],
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return WebViewIndex(
                         url: "http://211.20.21.35:8080/fjuheart/MH200110/index",
@@ -474,7 +502,7 @@ class _ListBuilderState extends State<ListBuilder> {
           // color: Colors.amber[100],
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return const HomeScreen1();
                     }));
@@ -495,7 +523,7 @@ class _ListBuilderState extends State<ListBuilder> {
           // color: Colors.amber[100],
           child: ListTile(
               onTap: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
                       return const LoginScreen();
                     }));
