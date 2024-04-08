@@ -2,9 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+
 import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:webview_flutter_upload/platform_interface.dart';
+// import 'package:webview_flutter_upload/webview_flutter.dart';
 
 // #docregion platform_imports
 // Import for Android features.
@@ -133,6 +137,37 @@ class _WebViewIndexState extends State<WebViewIndex> {
   void initState() {
     super.initState();
 
+
+
+    if (Platform.isAndroid) {
+      // final myAndroidController = _controller.platform as AndroidWebViewController;
+      // myAndroidController.setOnShowFileSelector(_androidFilePicker);
+    }
+
+    // Future<List<String>> _androidFilePicker(webview_flutter_android.FileSelectorParams params) async {
+    //   FilePickerResult? result = await FilePicker.platform.pickFiles();
+    //
+    //   if (result != null) {
+    //     String filePath = result.files.single.path!;
+    //     String fileName = result.files.single.name;
+    //
+    //     // Convert the file to base64
+    //     List<int> fileBytes = await File(filePath).readAsBytes();
+    //
+    //     //convert filepath into uri
+    //     final filePath1 = (await getCacheDirectory()).uri.resolve(fileName);
+    //     final file = await File.fromUri(filePath1).create(recursive: true);
+    //
+    //     //convert file in bytes
+    //     await file.writeAsBytes(fileBytes, flush: true);
+    //
+    //     return [file.uri.toString()];
+    //   }
+    //
+    //   return [];
+    // }
+
+    // addFileSelectionListener();
     // #docregion platform_features
     late final PlatformWebViewControllerCreationParams params;
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
@@ -143,6 +178,8 @@ class _WebViewIndexState extends State<WebViewIndex> {
     } else {
       params = const PlatformWebViewControllerCreationParams();
     }
+
+
 
     final WebViewController controller =
     WebViewController.fromPlatformCreationParams(params);
@@ -194,6 +231,15 @@ class _WebViewIndexState extends State<WebViewIndex> {
               ''');
           },
           onNavigationRequest: (NavigationRequest request) {
+            debugPrint('檔案');
+
+            if (request.url.startsWith('file://')) {
+              debugPrint('檔案');
+              debugPrint('檔案');
+              _handleFileUpload();
+              return NavigationDecision.prevent;
+            }
+
             if (request.url.startsWith('https://www.youtube.com/')) {
               debugPrint('blocking navigation to ${request.url}');
               return NavigationDecision.prevent;
@@ -231,11 +277,30 @@ class _WebViewIndexState extends State<WebViewIndex> {
     }
     // #enddocregion platform_features
 
+
     _controller = controller;
   }
 
   bool _isGridMode = true;
   bool _selectMode = true;
+
+
+
+  // void addFileSelectionListener() async {
+  //   if (Platform.isAndroid) {
+  //     final androidController = _controller.platform as AndroidWebViewController;
+  //     await androidController.setOnShowFileSelector(_androidFilePicker);
+  //   }
+  // }
+
+  void _handleFileUpload() async {
+    // 需要使用FilePicker或其他文件选择器
+    File file = (await FilePicker.platform.pickFiles()) as File;
+    // 获取选择的文件路径并传递给WebView中的input[type=file]元素
+    var filePath = file.path;
+    var jsCode = "document.querySelector('input[type=file]').value = '$filePath';";
+    await _controller.runJavaScriptReturningResult(jsCode);
+  }
 
 
   @override
@@ -382,6 +447,15 @@ class _WebViewIndexState extends State<WebViewIndex> {
       child: const Icon(Icons.favorite),
     );
   }
+}
+
+Future<List<String>> _androidFilePicker(final FileSelectorParams params) async {
+  final result = await FilePicker.platform.pickFiles();
+  if (result != null && result.files.single.path != null) {
+    final file = File(result.files.single.path!);
+    return [file.uri.toString()];
+  }
+  return [];
 }
 
 enum MenuOptions {

@@ -3,25 +3,46 @@ import 'package:devtest01/screen/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../Icon/MyFlutterApp.dart';
 import '../model/login_model.dart';
 import '../service/login_database_helper.dart';
 import 'Home.dart';
-import 'TestScreen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class InputScreen extends StatefulWidget {
+  const InputScreen({super.key});
+
+
+  // @override
+  // void initState() {
+  //   // super.initState();
+  //   _accountController.addListener(() {
+  //     // _accountController.text="2024-01-22";
+  //     // _passwordController.text="2024-01-22";
+  //     // final String text = _accountController.text.toLowerCase();
+  //     _accountController.value = _accountController.value.copyWith(
+  //       text: "2024-01-22",
+  //       //   selection:
+  //       //   TextSelection(baseOffset: text.length, extentOffset: text.length),
+  //       //   composing: TextRange.empty,
+  //     );
+  //
+  //   });
+  // }
 
   @override
-  State<LoginScreen> createState() {
+  State<InputScreen> createState() {
     return _LoginScreenState();
   }
 }
 
 //监听账号输入框的文字变化
 final TextEditingController _accountController = TextEditingController();
+
+
 //监听密码输入框的文字变化
 final TextEditingController _passwordController = TextEditingController();
-class _LoginScreenState extends State<LoginScreen> {
+
+class _LoginScreenState extends State<InputScreen> {
   //用于登录时判断输入的账号、密码是否符合要求
 
   @override
@@ -33,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
           title: const Text('AI警示系統登入',style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1))),
         ),
         body: ListView(
-          children: const [
+          children:  const [
             //  Image.asset(
             //   'images/lake.jpg',
             //   width: 600,
@@ -43,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // ),
             TextSection(),
             LoginButton(),
-            ForgetButton(),
+            // ForgetButton(),
             // Icon(MyFlutterApp.power_button),
             // TestButton()
           ],
@@ -81,27 +102,26 @@ class TestButton extends StatelessWidget {
                         fontSize: 20),
                   ),
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                          return  DatePickerApp();
-                        }));
-                    // Navigator.pushNamed(context, '/test');
+                    Navigator.pushNamed(context, '/test');
                   }))
         ]);
   }
 }
 
 class TextSection extends StatelessWidget {
-  const TextSection({super.key});
+   const TextSection({super.key});
+
+
+
 
   //账号输入框样式
-  static Widget buildAccountTextFied(TextEditingController controller) {
+  static Widget buildAccountTextFied(TextEditingController controller,BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 20, 0, 20),
       // data: ThemeData(primaryColor: Colors.amber, hintColor: Colors.black),
       child: TextField(
         //键盘的样式
-        keyboardType: TextInputType.text,
+        keyboardType: TextInputType.datetime,
         //监听
         controller: controller,
         //最大长度
@@ -124,6 +144,12 @@ class TextSection extends StatelessWidget {
         //   FilteringTextInputFormatter.allow(RegExp("[0-9.]")),
         // ],
         //内容改变回调
+
+        onTap: (){
+
+          // selectDate(context);
+
+        },
         onChanged: (account) {
           // print('change $account');
         },
@@ -140,25 +166,25 @@ class TextSection extends StatelessWidget {
             //有聚焦，labelText就会缩小到输入框左上角，颜色primaryColor，没聚焦前颜色跟hintColor
             // labelText: '帳號',
             //聚焦时才显示,颜色跟hintColor
-            hintText: '請輸入帳號',
+            // hintText: '請輸入帳號',
             //红色
 //            errorText: '输入错误',
             //红色，现在在输入框的左下角，跟errorText位置一样(优先显示errorText)
 //            helperText: 'acount',
             //输入框内左侧，有聚焦，颜色跟primaryColor
-            prefixIcon: const Icon(Icons.person),
+            // prefixIcon: const Icon(Icons.person),
             //输入框左侧的widget（可是text、icon……）
             icon: const Text(
-              '帳號：',
+              '開始：',
               style: TextStyle(fontSize: 20, color: Colors.black),
             ),
             //输入框内右侧的widget
-            suffixIcon: const Icon(Icons.account_circle),
+            // suffixIcon: const Icon(Icons.account_circle),
 //            有聚焦显示颜色跟hintColor，显示在输入框的右边
 //             suffixText: "后缀",
             contentPadding: const EdgeInsets.all(5),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(21.11), //边框裁剪成11.11°角
+              // borderRadius: BorderRadius.circular(21.11), //边框裁剪成11.11°角
               borderSide: const BorderSide(
                   color: Colors.black,
                   width: 25.0), //边框颜色、大小没有效果，所以使用返回的是Theme，
@@ -171,7 +197,7 @@ class TextSection extends StatelessWidget {
   static Widget buildPasswordTextFied(TextEditingController controller) {
     return TextField(
       //键盘的样式
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.datetime,
       //监听
       controller: controller,
       //最大长度
@@ -184,7 +210,8 @@ class TextSection extends StatelessWidget {
       //是否自动化对焦
       autofocus: false,
       //是否是密码格式(输入的内容不可见)
-      obscureText: true,
+      // obscureText: true,
+      obscureText: false,
       //文本对齐方式
       textAlign: TextAlign.start,
       //输入文本的样式
@@ -210,25 +237,25 @@ class TextSection extends StatelessWidget {
           //输入聚焦以后，labelText就会缩小到输入框左上角，红色,没聚焦前颜色跟hintColor
           // labelText: '密碼',
           //聚焦时才显示,颜色跟hintColor
-          hintText: '請輸入密碼',
+          // hintText: '請輸入密碼',
           //红色
 //          errorText: '输入错误',
           //红色，现在在输入框的左下角，跟errorText位置一样(优先显示errorText)
 //          helperText: 'password',
           //输入框内左侧widget，输入聚焦时，颜色跟primaryColor
-          prefixIcon: const Icon(Icons.lock),
+          // prefixIcon: const Icon(Icons.lock),
           //输入框左侧的widget（可是text、icon……）
           icon: const Text(
-            '密碼：',
+            '結束：',
             style: TextStyle(fontSize: 20, color: Colors.black),
           ),
           //输入框内右侧的widget
-          suffixIcon: const Icon(Icons.remove_red_eye),
+          // suffixIcon: const Icon(Icons.remove_red_eye),
           //聚焦时才显示颜色跟hintColor，显示在输入框的右边
           // suffixText: '后缀',
           contentPadding: const EdgeInsets.all(5),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(21.11), //边框裁剪成11.11°角
+            // borderRadius: BorderRadius.circular(21.11), //边框裁剪成11.11°角
             borderSide: const BorderSide(
                 color: Colors.black, width: 25.0), //没有效果，想要修改就返回Theme（如前面账号样式）
           )),
@@ -245,13 +272,43 @@ class TextSection extends StatelessWidget {
         //MainAxisAlignment：主轴方向上的对齐方式，会对child的位置起作用
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          buildAccountTextFied(_accountController),
+          buildAccountTextFied(_accountController,context),
           buildPasswordTextFied(_passwordController),
         ],
       ),
     );
   }
+
+
+
+  //  DateTime selectedDate;
+  //
+  // selectDate(BuildContext context) async {
+  //   DateTime? newSelectedDate = await showDatePicker(
+  //       context: context,
+  //       initialDate: selectedDate != null ? selectedDate : DateTime.now(),
+  //       firstDate: DateTime(2000),
+  //       lastDate: DateTime(2040),
+  //       // builder: (BuildContext context, Widget child) {
+  //       //   return Theme(
+  //       //     data: ThemeData.dark().copyWith(
+  //       //       colorScheme: ColorScheme.dark(
+  //       //         primary: Colors.deepPurple,
+  //       //         onPrimary: Colors.white,
+  //       //         surface: Colors.blueGrey,
+  //       //         onSurface: Colors.yellow,
+  //       //       ),
+  //       //       dialogBackgroundColor: Colors.blue[500],
+  //       //     ),
+  //       //     child: child,
+  //         );
+  //       }
+
+
+
 }
+
+
 
 
 

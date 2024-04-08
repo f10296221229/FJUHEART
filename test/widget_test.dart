@@ -16,18 +16,119 @@ import 'dart:convert';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
-  test('Counter value should be incremented', () async {
 
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-    print("object");
 
-    List<Login>? result = await DatabaseHelper.getAllNotes();
+  var DATA = [];
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00001"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 35.5
+    , "UPDATE_BY": "doctor"
+  });
 
-    if(result==null){
-      print("YES");
-    }
-    print('Query Result: $result');
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00002"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 58
+    , "UPDATE_BY": "doctor"
+  });
+
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00003"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 21
+    , "UPDATE_BY": "doctor"
+  });
+
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00004"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 120
+    , "UPDATE_BY": "doctor"
+  });
+
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00005"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 90
+    , "UPDATE_BY": "doctor"
+  });
+
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00006"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 95
+    , "UPDATE_BY": "doctor"
+  });
+
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00007"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 0
+    , "UPDATE_BY": "doctor"
+  });
+
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00008"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 0
+    , "UPDATE_BY": "doctor"
+  });
+
+  DATA.add({
+    "MEMBER_ID": "doctor"
+    , "TRANSACTION_SEQ": "202401171643047050009"
+    , "MEASURE_CODE": "M00009"
+    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_VALUE": 0
+    , "UPDATE_BY": "doctor"
+  });
+
+  var data = {"DATA": DATA};
+
+
+
+  final String jsonString = jsonEncode(data);
+
+
+  print(jsonString);
+
+
+  // print(int.tryParse("35")==null);
+
+  // DateTime pre=DateTime.now().subtract(Duration(days: 90));
+  // String t="${pre.year}-${pre.month < 10 ? "0${pre.month}" : pre.month}-${pre.day < 10 ? "0${pre.day}" : pre.day} 00:00:00";
+  // print(t);
+
+
+  // test('Counter value should be incremented', () async {
+  //
+  //   // sqfliteFfiInit();
+  //   // databaseFactory = databaseFactoryFfi;
+  //   // print("object");
+  //   //
+  //   // List<Login>? result = await DatabaseHelper.getAllNotes();
+  //   //
+  //   // if(result==null){
+  //   //   print("YES");
+  //   // }
+  //   print('Query Result: $result');
 
     // final response = await http.post(
     //   Uri.parse('http://211.20.21.35:8080/fjuheart/doMobilelogin'),
@@ -58,5 +159,5 @@ void main() {
     // counter.increment();
 
     // expect(counter.value, 1);
-  });
+
 }

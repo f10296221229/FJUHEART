@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../screen/Home.dart';
 import '../screen/LoginScreen.dart';
 import '../service/login_database_helper.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 String url="";
@@ -21,8 +22,6 @@ Future main() async {
   List<Login>? result = await DatabaseHelper.getAllNotes();
   if(result==null){
     url="/";
-
-
   }else{
     url="/Home";
     // print(result?[0].account);
@@ -42,6 +41,18 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
+      // localizationsDelegates: [
+      //   // ... app-specific localization delegate[s] here
+      //   GlobalMaterialLocalizations.delegate,
+      //   GlobalWidgetsLocalizations.delegate,
+      //   GlobalCupertinoLocalizations.delegate,
+      // ],
+      // supportedLocales: [
+      //   const Locale('en'), // English
+      //   const Locale('es'), // Spanish
+      //   const Locale('fr'), // French
+      //   const Locale('zh'), // Chinese
+      // ],
       onGenerateRoute: (settings) {
         WidgetBuilder builder;
         switch(url) {
