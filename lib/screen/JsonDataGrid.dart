@@ -40,6 +40,8 @@ class _JsonDataGridState extends State<JsonDataGrid> {
 
   _JsonDataGridState({required this.Measure_s, required this.Measure_e});
 
+  DateTime? _lastPressedAt;
+
   @override
   void initState() {
     String d =
@@ -149,7 +151,21 @@ class _JsonDataGridState extends State<JsonDataGrid> {
             style: TextStyle(fontSize: 28.0, height: 2),
           )
         ]),
-        const Builder()
+        const Builder(),
+        PopScope(
+          canPop: false,
+          onPopInvoked : (didPop){
+            if (didPop) {
+              return;
+
+            }
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (BuildContext context) {
+                  return   const HomeScreen1();
+                }));
+            // logic
+          }, child: Text(''),
+        )
       ]),
     );
   }
@@ -839,6 +855,20 @@ class _JsonDataGridView1 extends State<JsonDataGridView1> {
         title: const Text('生理指標'),
       ),
       body: ListView(children: <Widget>[
+
+        PopScope(
+          canPop: false,
+          onPopInvoked : (didPop){
+            if (didPop) {
+              return;
+            }
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (BuildContext context) {
+                  return  JsonDataGrid(Measure_s: MEASURE_DT_S, Measure_e: MEASURE_DT_E,);
+                }));
+            // logic
+          }, child: Text(''),
+        ),
         const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

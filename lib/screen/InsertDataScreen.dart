@@ -93,7 +93,21 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
           ),
         ),
         body: ListView(
-          children: const [
+          children:  [
+            PopScope(
+              canPop: false,
+              onPopInvoked : (didPop){
+                if (didPop) {
+                  return;
+                }
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return  JsonDataGrid(Measure_s: MEASURE_DT_S2, Measure_e: MEASURE_DT_E2,);
+                    }));
+                // logic
+              }, child: Text(''),
+            ),
+
             InsertTextSection(),
             // ImagePickerScreen(),
             InsertButton(),

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:devtest01/screen/DataGrid.dart';
 import 'package:devtest01/webview/webviewIndex.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import '../Icon/MyFlutterApp.dart';
 import '../model/login_model.dart';
@@ -40,15 +43,13 @@ class ListTileSelectExampleState extends State<ListTileSelectExample> {
     super.initState();
   }
 
-  void initializeSelection() {
-  }
-
+  void initializeSelection() {}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor:  Colors.cyan,
+          backgroundColor: Colors.cyan,
           title: const Text('AI示警系統',
               style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1))),
           leading: _selectMode
@@ -82,20 +83,13 @@ class ListTileSelectExampleState extends State<ListTileSelectExample> {
                   await DatabaseHelper.deleteNote(result![0]);
                   Navigator.push(context,
                       MaterialPageRoute(builder: (BuildContext context) {
-                        return const LoginScreen();
-                      }));
+                    return const LoginScreen();
+                  }));
                   // Navigator.of(context).pushNamed('/'); //跳转到main.dart对routeName（'/'）的界面
                 }),
           ],
-
         ),
-        body: _isGridMode
-            ? const GridBuilder(
-
-              )
-            : const ListBuilder(
-
-              ));
+        body: _isGridMode ? const GridBuilder() : const ListBuilder());
   }
 }
 
@@ -116,16 +110,50 @@ class GridBuilder extends StatefulWidget {
 }
 
 class GridBuilderState extends State<GridBuilder> {
+  DateTime? _lastPressedAt;
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
+        PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) {
+            if (didPop) {
+             return;
+            }
+
+
+            // print("_lastPressedAt");
+            // print(_lastPressedAt);
+            // exit(0);
+            // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+            // Navigator.pop(context);
+            if (_lastPressedAt == null ||
+                DateTime.now().difference(_lastPressedAt!) > Duration(seconds: 1)) {
+              //两次点击间隔超过1秒则重新计时
+              _lastPressedAt = DateTime.now();
+
+              // Navigator.pop(context);
+            }else{
+              SystemNavigator.pop();
+              _lastPressedAt =null;
+            }
+            // Navigator.pushReplacement(context,
+            //     MaterialPageRoute(builder: (BuildContext context) {
+            //       return   const HomeScreen1();
+            //     }));
+            // logic
+          },
+          child: Text(''),
+        ),
+
         InkWell(
           onTap: () {
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (BuildContext context) {
-                  return   JsonDataGrid(Measure_s: '', Measure_e: '');
-                }));
+              return JsonDataGrid(Measure_s: '', Measure_e: '');
+            }));
             // Navigator.push(context,
             //     MaterialPageRoute(builder: (BuildContext context) {
             //       return  WebViewIndex(
@@ -147,10 +175,10 @@ class GridBuilderState extends State<GridBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return  WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200102/index",
-                      );
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200102/index",
+                  );
+                }));
               },
               child: Ink.image(
                   width: 120,
@@ -163,10 +191,10 @@ class GridBuilderState extends State<GridBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return  WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200103/index",
-                      );
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200103/index",
+                  );
+                }));
               },
               child: Ink.image(
                   width: 120,
@@ -179,10 +207,10 @@ class GridBuilderState extends State<GridBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return  WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200104/index",
-                      );
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200104/index",
+                  );
+                }));
               },
               child: Ink.image(
                   width: 120,
@@ -200,10 +228,10 @@ class GridBuilderState extends State<GridBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return  WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200105/index",
-                      );
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200105/index",
+                  );
+                }));
               },
               child: Ink.image(
                   width: 120,
@@ -216,10 +244,10 @@ class GridBuilderState extends State<GridBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return  WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200106/index",
-                      );
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200106/index",
+                  );
+                }));
               },
               child: Ink.image(
                   width: 120,
@@ -234,10 +262,10 @@ class GridBuilderState extends State<GridBuilder> {
           onTap: () {
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (BuildContext context) {
-                  return  WebViewIndex(
-                    url: "http://211.20.21.35:8080/fjuheart/MH200110/index",
-                  );
-                }));
+              return WebViewIndex(
+                url: "http://211.20.21.35:8080/fjuheart/MH200110/index",
+              );
+            }));
           },
           child: Ink.image(
               width: 300,
@@ -334,8 +362,8 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return   JsonDataGrid(Measure_s: '', Measure_e: '');
-                    }));
+                  return JsonDataGrid(Measure_s: '', Measure_e: '');
+                }));
                 // Navigator.push(context,
                 //     MaterialPageRoute(builder: (BuildContext context) {
                 //       return WebViewIndex(
@@ -346,8 +374,10 @@ class _ListBuilderState extends State<ListBuilder> {
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(MyFlutterApp.input,color:Color.fromRGBO(
-                      244, 54, 98, 1.0),),
+                  Icon(
+                    MyFlutterApp.input,
+                    color: Color.fromRGBO(244, 54, 98, 1.0),
+                  ),
                   Text('生理指標輸入'),
                 ],
               )),
@@ -362,11 +392,10 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200102/index",
-                      );
-
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200102/index",
+                  );
+                }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -384,11 +413,10 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200103/index",
-                      );
-
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200103/index",
+                  );
+                }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -408,11 +436,10 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200104/index",
-                      );
-
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200104/index",
+                  );
+                }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -432,11 +459,10 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200105/index",
-                      );
-
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200105/index",
+                  );
+                }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -456,11 +482,10 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200106/index",
-                      );
-
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200106/index",
+                  );
+                }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -480,11 +505,10 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return WebViewIndex(
-                        url: "http://211.20.21.35:8080/fjuheart/MH200110/index",
-                      );
-
-                    }));
+                  return WebViewIndex(
+                    url: "http://211.20.21.35:8080/fjuheart/MH200110/index",
+                  );
+                }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -504,8 +528,8 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return const HomeScreen1();
-                    }));
+                  return const HomeScreen1();
+                }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,
@@ -525,8 +549,8 @@ class _ListBuilderState extends State<ListBuilder> {
               onTap: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                      return const LoginScreen();
-                    }));
+                  return const LoginScreen();
+                }));
               },
               title: const Row(
                 mainAxisSize: MainAxisSize.min,

@@ -124,9 +124,23 @@ class _UpdateDataScreenState extends State<UpdateDataScreen> {
           ),
         ),
         body: ListView(
-          children: const [
-            UpdateTextSection(),
-            UpdateButton(),
+          children:  [
+            PopScope(
+              canPop: false,
+              onPopInvoked : (didPop){
+                if (didPop) {
+                  return;
+                }
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return  const JsonDataGridView1();
+                    }));
+                // logic
+              }, child: const Text(''),
+            ),
+
+            const UpdateTextSection(),
+            const UpdateButton(),
             // if (showBarrier)
             //   // const Center(
             //   //   child: CircularProgressIndicator(

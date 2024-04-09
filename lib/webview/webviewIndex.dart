@@ -404,6 +404,20 @@ class _WebViewIndexState extends State<WebViewIndex> {
 
         body:_isGridMode ? Stack(
           children: [
+            PopScope(
+              canPop: false,
+              onPopInvoked : (didPop){
+                if (didPop) {
+                  return;
+                }
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return   const HomeScreen1();
+                    }));
+                // logic
+              }, child: Text(''),
+            ),
+
           WebViewWidget(
           controller: _controller,
         ),
