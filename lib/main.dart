@@ -2,12 +2,14 @@ import 'package:devtest01/model/login_model.dart';
 import 'package:devtest01/screen/ForgetScreen.dart';
 import 'package:devtest01/screen/HomeScreen1.dart';
 import 'package:devtest01/screen/RegisterScreen.dart';
+import 'package:devtest01/service/PostProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../screen/Home.dart';
 import '../screen/LoginScreen.dart';
 import '../service/login_database_helper.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 String url="";
@@ -36,23 +38,19 @@ class MyApp extends StatelessWidget {
    const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+
+    return MultiProvider(
+        providers: [
+        ChangeNotifierProvider<PostProvider>(
+        create: (context) => PostProvider(),
+    ),
+    ],
+     child:  MaterialApp(
         title: 'AI示警登入',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-      // localizationsDelegates: [
-      //   // ... app-specific localization delegate[s] here
-      //   GlobalMaterialLocalizations.delegate,
-      //   GlobalWidgetsLocalizations.delegate,
-      //   GlobalCupertinoLocalizations.delegate,
-      // ],
-      // supportedLocales: [
-      //   const Locale('en'), // English
-      //   const Locale('es'), // Spanish
-      //   const Locale('fr'), // French
-      //   const Locale('zh'), // Chinese
-      // ],
+
       onGenerateRoute: (settings) {
         WidgetBuilder builder;
         switch(url) {
@@ -67,6 +65,16 @@ class MyApp extends StatelessWidget {
         }
         return  MaterialPageRoute(builder: builder, settings: settings);
       },
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        // Locale("zh", "CH"),
+        Locale("zh", "TW"),
+        // Locale("en", "US")
+      ],
         // initialRoute: url,
         // routes: {
         //   '/': (BuildContext context) => const LoginScreen(),
@@ -75,7 +83,7 @@ class MyApp extends StatelessWidget {
         //   '/Register': (BuildContext context) => const RegisterScreen(),
         //   '/HomeScreen1': (BuildContext context) => const HomeScreen1(),
         // }
-    );
+    ));
   }
 }
 

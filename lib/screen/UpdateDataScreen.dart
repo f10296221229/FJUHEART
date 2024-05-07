@@ -5,14 +5,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'dart:convert';
 import '../model/Product1.dart';
 import '../model/login_model.dart';
+import '../partition/LoadingDialog.dart';
 import '../service/login_database_helper.dart';
 import 'JsonDataGrid.dart';
 import 'dart:io';
+import 'package:path/path.dart' as p;
 
 late String TRANSACTION_SEQ1 = "";
+late String M7 = "";
 late StringBuffer buffer = StringBuffer('');
 File? _imageFile;
 late String imageUrlG = "";
@@ -51,14 +55,12 @@ final FocusNode eFocus = FocusNode();
 final FocusNode fFocus = FocusNode();
 
 class _UpdateDataScreenState extends State<UpdateDataScreen> {
-  // late String imageUrl1="";
   _UpdateDataScreenState(this.imageUrl1);
 
   final String imageUrl1;
 
   @override
   void initState() {
-
     _imageFile = null;
 
     if (imageUrl1 != "") {
@@ -91,13 +93,10 @@ class _UpdateDataScreenState extends State<UpdateDataScreen> {
 
     TRANSACTION_SEQ1 = list[0].TRANSACTION_SEQ!;
 
-    // main1();
+    M7 = list[6].MEASURE_CODE_GRADE ==null ? "0" : list[6].MEASURE_CODE_GRADE.toString().replaceAll(".0", "");
+
   }
 
-  // Future<List<Product1>> _getList2() {
-  //   ApiManager1 apiManager1 = ApiManager1();
-  //   return apiManager1.generateProductList2();
-  // }
 
   Future<List<Product1>> _getList() {
     ApiManager1 apiManager1 = ApiManager1();
@@ -108,8 +107,10 @@ class _UpdateDataScreenState extends State<UpdateDataScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.cyan,
           leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back,color: Color.fromRGBO(255, 255, 255, 1)),
               onPressed: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
@@ -120,123 +121,58 @@ class _UpdateDataScreenState extends State<UpdateDataScreen> {
           // automaticallyImplyLeading: false,
           title: const Text(
             '生理指標',
-            // style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1))
+            style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1))
           ),
         ),
-        body: ListView(
-          children:  [
-            PopScope(
-              canPop: false,
-              onPopInvoked : (didPop){
-                if (didPop) {
-                  return;
-                }
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (BuildContext context) {
-                      return  const JsonDataGridView1();
-                    }));
-                // logic
-              }, child: const Text(''),
-            ),
-
-            const UpdateTextSection(),
-            const UpdateButton(),
-            // if (showBarrier)
-            //   // const Center(
-            //   //   child: CircularProgressIndicator(
-            //   //     strokeWidth: 3,
-            //   //   ),
-            //   // )
-            //   ModalBarrier(
-            //     color: Colors.black38,
-            //   ),
-            // ForgetButton()
-          ],
-        ));
-  }
-}
-
-class LoadingDialog extends Dialog {
-  LoadingDialog(this.canceledOnTouchOutside) : super();
-
-  ///点击背景是否能够退出
-  final bool canceledOnTouchOutside;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Material(
-
-          ///背景透明
-          color: Colors.transparent,
-
-          ///保证控件居中效果
-          child: Stack(
-            children: <Widget>[
-              GestureDetector(
-                ///点击事件
-                onTap: () {
-                  // if (canceledOnTouchOutside) {
-                  //   Navigator.pop(context);
-                  // }
+        body:
+        Container(
+            color: Color(int.parse("dfe6f0", radix: 16)).withAlpha(255),
+            child: ListView(
+            children: [
+              PopScope(
+                canPop: false,
+                onPopInvoked: (didPop) {
+                  if (didPop) {
+                    return;
+                  }
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return const JsonDataGridView1();
+                      }));
+                  // logic
                 },
+                child: const Divider(height: 0,),
               ),
-              _dialog()
+
+              const UpdateTextSection(),
+              const UpdateButton(),
+              // if (showBarrier)
+              //   // const Center(
+              //   //   child: CircularProgressIndicator(
+              //   //     strokeWidth: 3,
+              //   //   ),
+              //   // )
+              //   ModalBarrier(
+              //     color: Colors.black38,
+              //   ),
+              // ForgetButton()
             ],
           )),
-    );
-  }
-
-  Widget _dialog() {
-    return Center(
-      ///弹框大小
-      child:  SizedBox(
-        width: 120.0,
-        height: 120.0,
-        child:  Container(
-          ///弹框背景和圆角
-          decoration: const ShapeDecoration(
-            color: Color(0xffffffff),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-            ),
-          ),
-          child:  const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-               CircularProgressIndicator(),
-               Padding(
-                padding: EdgeInsets.only(
-                  top: 20.0,
-                ),
-                child:  Text(
-                  "執行中",
-                  style:  TextStyle(fontSize: 16.0),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+        )
+        ;
   }
 }
+
+
 
 class UpdateButton extends StatefulWidget {
   const UpdateButton({Key? key}) : super(key: key);
-
-  // final String title;
   @override
   createState() => _UpdateButtonState();
 }
 
 //儲存
 class _UpdateButtonState extends State<UpdateButton> {
-  // _UpdateButtonState({super.key});
-
   late BuildContext dialogContext;
 
   void _showDialog() {
@@ -245,7 +181,7 @@ class _UpdateButtonState extends State<UpdateButton> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           dialogContext = context;
-          return LoadingDialog(true);
+          return const LoadingDialog(true);
         });
   }
 
@@ -269,24 +205,6 @@ class _UpdateButtonState extends State<UpdateButton> {
         _phoneState = false;
       }
     }
-
-    // if (_phoneController.text.isEmpty) {
-    //   _checkHint = '手機輸入不為空!';
-    //   _phoneState = true;
-    // } else {
-    //   if(_phoneController.text.length!=10){
-    //     _checkHint = '手機輸入不為10碼!';
-    //     _phoneState = true;
-    //   }else{
-    //     RegExp phone = RegExp(r'^09\d{8}$');
-    //     if(phone.hasMatch(_phoneController.text)==false){
-    //       _checkHint = '手機輸入為09開頭及10碼數字!';
-    //       _phoneState = true;
-    //     }else{
-    //       _phoneState = false;
-    //     }
-    //   }
-    // }
   }
 
   static void _mail() {
@@ -301,19 +219,6 @@ class _UpdateButtonState extends State<UpdateButton> {
         _mailState = false;
       }
     }
-
-    // if (_mailController.text.isEmpty) {
-    //   _checkHint = '信箱輸入不為空!';
-    //   _mailState = true;
-    // } else {
-    //   RegExp phone = RegExp(r'^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$');
-    //   if(phone.hasMatch(_mailController.text)==false){
-    //     _checkHint = '須符合信箱格式!';
-    //     _mailState = true;
-    //   }else{
-    //     _mailState = false;
-    //   }
-    // }
   }
 
   static void _checkAccount() {
@@ -343,35 +248,7 @@ class _UpdateButtonState extends State<UpdateButton> {
       }
     }
 
-    // if (_passwordController.text.isEmpty) {
-    //   _passwordState = true;
-    //   _checkHint = '密碼不為空!';
-    // } else {
-    //   if(_passwordController.text.length<8){
-    //     _passwordState = true;
-    //     _checkHint = '密碼需大於8碼!';
-    //   }else{
-    //     RegExp phone = RegExp(r'[a-z]');
-    //     if(phone.hasMatch(_passwordController.text)==false){
-    //       _checkHint = '密碼應至少包含 8 個字元,包括至少一個大寫字母和一個小寫字母,和一個數字!';
-    //       _passwordState = true;
-    //     }else{
-    //       phone = RegExp(r'[A-Z]');
-    //       if(phone.hasMatch(_passwordController.text)==false){
-    //         _checkHint = '密碼應至少包含 8 個字元,包括至少一個大寫字母和一個小寫字母,和一個數字!';
-    //         _passwordState = true;
-    //       }else{
-    //         phone = RegExp(r'[0-9]');
-    //         if(phone.hasMatch(_passwordController.text)==false){
-    //           _checkHint = '密碼應至少包含 8 個字元,包括至少一個大寫字母和一個小寫字母,和一個數字!';
-    //           _passwordState = true;
-    //         }else{
-    //           _passwordState = false;
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+
   }
 
   static void _confirmpassword() {
@@ -387,17 +264,7 @@ class _UpdateButtonState extends State<UpdateButton> {
       }
     }
 
-    // if (_confirmpasswordController.text.isEmpty) {
-    //   _confirmpasswordState = true;
-    //   _checkHint = '確認密碼不為空!';
-    // } else {
-    //   if (_passwordController.text !=_confirmpasswordController.text) {
-    //     _confirmpasswordState = true;
-    //     _checkHint = '確認密碼須和密碼相同!';
-    //   }else{
-    //     _confirmpasswordState = false;
-    //   }
-    // }
+
   }
 
   static void _spo2word() {
@@ -485,12 +352,9 @@ class _UpdateButtonState extends State<UpdateButton> {
                       foregroundColor: Colors.black,
                       elevation: 0,
                       minimumSize:
-                          Size(MediaQuery.of(context).size.width - 20, 40)),
+                          Size(MediaQuery.of(context).size.width - 200, 40)),
                   onPressed: (() async {
                     // BuildContext dialogContext;
-
-
-
 
                     // setState(() {
                     //   showBarrier = true;
@@ -549,11 +413,14 @@ class _UpdateButtonState extends State<UpdateButton> {
                       return;
                     }
 
+
+
+
+
+
                     _showDialog();
 
                     // await Future.delayed(Duration(seconds: 5));
-
-
 
                     if (_imageFile == null && imageUrlG != "") {
                       var f = await resp();
@@ -602,6 +469,11 @@ class _UpdateTextSectionState extends State<UpdateTextSection> {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
+      String extension = p.extension(pickedFile!.path);
+      if(extension.trim() !=".jpg" && extension.trim() !=".jpeg"){
+        _dialogBuilder(context, "圖片格式須為jpg或jpeg", "X");
+        return;
+      }
       _imageFile = File(pickedFile!.path);
     });
   }
@@ -1109,10 +981,7 @@ class _UpdateTextSectionState extends State<UpdateTextSection> {
             child: const Text(
               '(正常範圍介於35.0~39.1)',
               style:
-              TextStyle(
-                  color: Color.fromRGBO(0, 0, 0, 1.0)
-                  , fontSize: 14
-              ),
+                  TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
             ),
           ),
           buildPhoneTextField(_phoneController),
@@ -1121,7 +990,7 @@ class _UpdateTextSectionState extends State<UpdateTextSection> {
             child: const Text(
               '(正常範圍介於40~131)',
               style:
-              TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
+                  TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
             ),
           ),
           buildMailTextField(_mailController),
@@ -1130,7 +999,7 @@ class _UpdateTextSectionState extends State<UpdateTextSection> {
             child: const Text(
               '(正常範圍介於8~25)',
               style:
-              TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
+                  TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
             ),
           ),
           buildPasswordTextField(_passwordController),
@@ -1139,7 +1008,7 @@ class _UpdateTextSectionState extends State<UpdateTextSection> {
             child: const Text(
               '(正常範圍介於90~220)',
               style:
-              TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
+                  TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
             ),
           ),
           buildConfirmPasswordTextField(_confirmpasswordController),
@@ -1148,7 +1017,7 @@ class _UpdateTextSectionState extends State<UpdateTextSection> {
             child: const Text(
               '(正常範圍介於50~120)',
               style:
-              TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
+                  TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
             ),
           ),
           buildSpO2TextField(_spo2Controller),
@@ -1157,7 +1026,15 @@ class _UpdateTextSectionState extends State<UpdateTextSection> {
             child: const Text(
               '(正常範圍介於88~101)',
               style:
-              TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
+                  TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
+            ),
+          ),
+          Container(
+            // margin: const EdgeInsets.fromLTRB(0, 0, 100, 0),
+            child: const Text(
+              '心電圖',
+              style:
+              TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 24),
             ),
           ),
           Row(children: [
@@ -1270,7 +1147,7 @@ Future resp() async {
     "MEMBER_ID": s,
     "TRANSACTION_SEQ": TRANSACTION_SEQ1,
     "MEASURE_CODE": "M00007",
-    "MEASURE_CODE_GRADE": "0",
+    "MEASURE_CODE_GRADE": M7,
     "MEASURE_VALUE": 0,
     "UPDATE_BY": s
   });
@@ -1330,6 +1207,42 @@ Future resp() async {
 
 Future resp1() async {
   String flag = "";
+
+
+
+  var logger = Logger(
+    printer: PrettyPrinter(),
+  );
+
+  final requestma = http.MultipartRequest(
+    'POST',
+    Uri.parse('http://140.136.149.212:5000/tf_api/ecg/prediction'),
+  );
+  requestma.files.add(await http.MultipartFile.fromPath(
+    'image',
+    _imageFile!.path,
+  ));
+
+  int str;
+  try{
+    final responsema = await http.Response.fromStream(await requestma.send());
+    if (responsema.statusCode == 200) {
+      if (jsonDecode(responsema.body)["prediction_result"] != null) {
+        str=jsonDecode(responsema.body)["prediction_result"][0][0];
+        flag = "Y";
+      }else{
+        flag = "格式不符";
+        return flag;
+      }
+    } else {
+      flag = "文件傳輸失敗";
+      return flag;
+    }
+  }catch(error){
+    logger.e(error, error: 'Test Error');
+    flag =error.toString();
+    return flag;
+  }
 
   var DATA = [];
 
@@ -1394,7 +1307,7 @@ Future resp1() async {
     "MEMBER_ID": s,
     "TRANSACTION_SEQ": TRANSACTION_SEQ1,
     "MEASURE_CODE": "M00007",
-    "MEASURE_CODE_GRADE": "0",
+    "MEASURE_CODE_GRADE": str.toString(),
     "MEASURE_VALUE": 0,
     "UPDATE_BY": s
   });
@@ -1427,22 +1340,10 @@ Future resp1() async {
         // 'Access-Control-Allow-Origin': '*',
       },
       body: jsonString
-      // body: jsonEncode(<String, String>{
-      //   // "EMAIL": EMAIL
-      //   // , "USER_PASSWORD_ENC": userPasswordEnc
-      //   // , "USER_NAME": userName
-      //   // , "TELEPHONE": PHONE
-      //   // EMAIL: $("#EMAIL").val()
-      //   // , USER_PASSWORD_ENC: $("#USER_PASSWORD_ENC").val()
-      //   // , USER_NAME: $("#USER_NAME").val()
-      //   // , TELEPHONE: $("#TELEPHONE").val()
-      // }),
       );
 
   if (response.statusCode == 200) {
     if (jsonDecode(response.body)["RETURNVALUE"] == "Y") {
-      // flag = "Y";
-
       final request1 = http.MultipartRequest(
         'POST',
         Uri.parse('http://211.20.21.35:8080/fjuheart/MH200101/insertattach'),
@@ -1460,17 +1361,10 @@ Future resp1() async {
         if (jsonDecode(response1.body)["RETURNVALUE"] == "Y") {
           flag = "Y";
         } else {
-          flag = jsonDecode(response.body)["RETURNMSG"];
+          flag = jsonDecode(response1.body)["RETURNMSG"];
         }
-
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text('Upload success!')),
-        // );
       } else {
         flag = "文件傳輸失敗";
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text('Upload failed!')),
-        // );
       }
     } else {
       flag = jsonDecode(response.body)["RETURNMSG"];
@@ -1478,17 +1372,6 @@ Future resp1() async {
   } else {
     flag = "連線失敗";
   }
-
-  // if (response.statusCode == 200) {
-  //   if (jsonDecode(response.body)["RETURNVALUE"] == "Y") {
-  //     flag = "Y";
-  //   } else {
-  //     flag = jsonDecode(response.body)["RETURNMSG"];
-  //   }
-  // } else {
-  //   flag = "連線失敗";
-  // }
-
   return flag;
 }
 
@@ -1504,11 +1387,6 @@ Future<void> _dialogBuilder(
         ),
         content: Text(checkHint),
         actions: <Widget>[
-          // TextButton(//一个扁平的Material按钮
-          //     onPressed: () {
-          //       Navigator.of(context).pop();//弹窗消失
-          //     },
-          //     child: const Text('取消')),
           TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); //弹窗消失
@@ -1546,6 +1424,19 @@ Future<void> _dialogBuilder(
 }
 
 Future<void> _dialogBuilder2(BuildContext context, String checkHint) {
+
+  late BuildContext dialogContext;
+
+  void _showDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          dialogContext = context;
+          return const LoadingDialog(true);
+        });
+  }
+
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -1566,12 +1457,31 @@ Future<void> _dialogBuilder2(BuildContext context, String checkHint) {
           TextButton(
               onPressed: () async {
                 //送出
-                var f = await resp();
-                if (f == "Y") {
-                  _dialogBuilder1(context, "修改完成");
+                _showDialog();
+                if (_imageFile == null && imageUrlG != "") {
+                  var f = await resp();
+                  if (f == "Y") {
+                    Navigator.pop(dialogContext);
+                    _dialogBuilder1(context, "修改完成");
+                    buffer.clear();
+                  } else {
+                    Navigator.pop(dialogContext);
+                    _dialogBuilder(context, f, "X");
+                    buffer.clear();
+                  }
                 } else {
-                  _dialogBuilder(context, f, "");
+                  var f = await resp1();
+                  if (f == "Y") {
+                    Navigator.pop(dialogContext);
+                    _dialogBuilder1(context, "修改完成");
+                    buffer.clear();
+                  } else {
+                    Navigator.pop(dialogContext);
+                    _dialogBuilder(context, f, "X");
+                    buffer.clear();
+                  }
                 }
+
                 buffer.clear();
               },
               child: const Text('確定')),

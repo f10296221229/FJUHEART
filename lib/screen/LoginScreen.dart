@@ -6,7 +6,7 @@ import 'dart:convert';
 import '../model/login_model.dart';
 import '../service/login_database_helper.dart';
 import 'Home.dart';
-import 'TestScreen.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -52,44 +52,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-
-class TestButton extends StatelessWidget {
-  const TestButton({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      // 水平讓各自 Container 間有間距
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        // 垂直靠下
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(
-              margin: const EdgeInsets.fromLTRB(50, 20, 0, 20),
-              // color: Colors.red,
-              child: ElevatedButton(
-                //一个凸起的材质矩形按钮
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    foregroundColor: Colors.black,
-                    elevation: 0,
-                  ),
-                  // color: Colors.red,
-                  child: const Text(
-                    '測試首頁',
-                    style: TextStyle(
-                        color: Color.fromRGBO(0, 94, 255, 1.0),
-                        fontSize: 20),
-                  ),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                          return  DatePickerApp();
-                        }));
-                    // Navigator.pushNamed(context, '/test');
-                  }))
-        ]);
-  }
-}
 
 class TextSection extends StatelessWidget {
   const TextSection({super.key});
@@ -377,10 +339,6 @@ class LoginButton extends StatelessWidget {
                     var f = await resp(
                         _accountController.text, _passwordController.text);
                     if (f == "Y") {
-
-
-                      // WidgetBuilder builder;
-                      // builder = (_) => const Home();
                       Navigator.push(context,
                           MaterialPageRoute(builder: (BuildContext context) {
                             return const Home();

@@ -10,7 +10,10 @@ class Product {
         M00005: json['M00005'],
         M00006: json['M00006'],
         M00007: json['M00007'],
-        M00008: json['M00008']);
+        M00008: json['M00008'],
+        MEMBER_ID: json['MEMBER_ID'],
+        MEASURE_VALUE: json['MEASURE_VALUE']
+    );
   }
 
   Product({
@@ -24,10 +27,13 @@ class Product {
     this.M00006,
     this.M00007,
     this.M00008,
+    this.MEMBER_ID,
+    this.MEASURE_VALUE,
   });
 
   String? MEASURE_DT;
   String? TRANSACTION_SEQ;
+  String? MEMBER_ID;
   double? M00001;
   double? M00002;
   double? M00003;
@@ -36,4 +42,5 @@ class Product {
   double? M00006;
   double? M00007;
   double? M00008;
+  double? MEASURE_VALUE;
 }

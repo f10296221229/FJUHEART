@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:datetime_picker_formfield_new/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import '../model/Product.dart';
 import '../model/login_model.dart';
+import '../partition/ListBuilder.dart';
 import '../service/login_database_helper.dart';
 import 'HomeScreen1.dart';
 import 'InsertDataScreen.dart';
@@ -40,21 +40,21 @@ class _JsonDataGridState extends State<JsonDataGrid> {
 
   _JsonDataGridState({required this.Measure_s, required this.Measure_e});
 
-  DateTime? _lastPressedAt;
+  bool _isGridMode = true;
+  bool _selectMode = true;
 
   @override
   void initState() {
     String d =
         "${DateTime.now().year}-${DateTime.now().month < 10 ? "0${DateTime.now().month}" : DateTime.now().month}-${DateTime.now().day < 10 ? "0${DateTime.now().day}" : DateTime.now().day}";
-
     String t =
-        "${DateTime.now().subtract(const Duration(days: 180)).year}-${DateTime.now().subtract(const Duration(days: 180)).month < 10 ? "0${DateTime.now().subtract(const Duration(days: 180)).month}" : DateTime.now().subtract(const Duration(days: 180)).month}-${DateTime.now().subtract(const Duration(days: 180)).day < 10 ? "0${DateTime.now().subtract(const Duration(days: 180)).day}" : DateTime.now().subtract(const Duration(days: 180)).day}";
+        "${DateTime.now().year}-${DateTime.now().month < 10 ? "0${DateTime.now().month}" : DateTime.now().month}-01";
+
+    // "${DateTime.now().subtract(const Duration(days: 180)).year}-${DateTime.now().subtract(const Duration(days: 180)).month < 10 ? "0${DateTime.now().subtract(const Duration(days: 180)).month}" : DateTime.now().subtract(const Duration(days: 180)).month}-${DateTime.now().subtract(const Duration(days: 180)).day < 10 ? "0${DateTime.now().subtract(const Duration(days: 180)).day}" : DateTime.now().subtract(const Duration(days: 180)).day}";
 
     MEASURE_DT_S = Measure_s == "" ? t : Measure_s;
     MEASURE_DT_E = Measure_e == "" ? d : Measure_e;
 
-    // print(MEASURE_DT_S);
-    // print(MEASURE_DT_E);
     super.initState();
   }
 
@@ -62,111 +62,150 @@ class _JsonDataGridState extends State<JsonDataGrid> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (BuildContext context) {
-                    return   const HomeScreen1();
-                  }));
-            }
-        ),
-        title: const Text('生理指標'),
+        centerTitle: true,
+        backgroundColor: Colors.cyan,
+        leading:
+        Row(
+          children: [
+            // IconButton(
+            //     icon: const Icon(
+            //         Icons.arrow_back
+            //         ,color: Color.fromRGBO(255, 255, 255, 1)
+            //     ),
+            //     onPressed: () {
+            //       Navigator.pushReplacement(context,
+            //           MaterialPageRoute(builder: (BuildContext context) {
+            //             return const HomeScreen1();
+            //           }));
+            //     }),
+            _selectMode ? IconButton(
+                icon: const Icon(
+                  Icons.menu,
+                  color: Color.fromRGBO(255, 255, 255, 1),
+                ),
+                onPressed: () => {
+                  setState(() {
+                    _isGridMode = false;
+                    _selectMode = false;
+                  })
+                })
+                : IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  color: Color.fromRGBO(255, 255, 255, 1),
+                ),
+                onPressed: () => {
+                  setState(() {
+                    _isGridMode = true;
+                    _selectMode = true;
+                  })
+                })
+          ],
+        )
+        // IconButton(
+        //     icon: const Icon(Icons.arrow_back),
+        //     onPressed: () {
+        //       Navigator.pushReplacement(context,
+        //           MaterialPageRoute(builder: (BuildContext context) {
+        //             return   const HomeScreen1();
+        //           }));
+        //     }
+        // ),
+        ,title: const Text('生理指標',style: TextStyle(
+          color: Color.fromRGBO(255, 255, 255, 1))),
       ),
-      body: ListView(children: <Widget>[
-        Card(
-          margin: const EdgeInsets.all(10),
-          color: Colors.green[100],
-          shadowColor: Colors.blueGrey,
-          elevation: 10,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      body: _isGridMode ?
+      Container(
+        color: Color(int.parse("dfe6f0", radix: 16)).withAlpha(255),
+        child: ListView(
             children: <Widget>[
-              Ink(
-                color: Colors.purple[600],
-                height: 20,
-                child: ListTile(
-                  title: const Text(''),
-                  onTap: () {},
+              Card(
+                margin: const EdgeInsets.all(10),
+                color: Colors.green[100],
+                shadowColor: Colors.blueGrey,
+                elevation: 10,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Ink(
+                      color: Colors.purple[600],
+                      height: 20,
+                      child: ListTile(
+                        title: const Text(''),
+                        onTap: () {},
+                      ),
+                    ),
+
+                    const TextSectionDate(),
+                  ],
                 ),
               ),
-              const TextSectionDate(),
-              // ListTile(
-              //   leading: Icon(Icons.album, color: Colors.cyan, size: 45),
-              //   title: Text(
-              //     "Let's Talk About Love",
-              //     style: TextStyle(fontSize: 20),
-              //   ),
-              //   subtitle: Text('Modern Talking Album'),
-              // ),
-            ],
-          ),
-        ),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            // 垂直靠下
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Container(
-                  // height: 50,
-                  // width: 300,
-                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: TextButton(
-                      //一个凸起的材质矩形按钮
-                      style: TextButton.styleFrom(
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero,
-                            // side: BorderSide(color: Colors.red)
-                          ),
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.black,
-                          minimumSize:
-                              Size(MediaQuery.of(context).size.width - 20, 40)
-                          // elevation: 10,
-                          ),
-                      child: const Text(
-                        '新增紀錄',
-                        style: TextStyle(
-                            color: Color.fromRGBO(255, 255, 255, 1.0),
-                            fontSize: 20),
-                      ),
-                      onPressed: () async {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (BuildContext context) {
-                          return  InsertDataScreen(MEASURE_DT_S1: MEASURE_DT_S, MEASURE_DT_E1: MEASURE_DT_E,);
-                        }));
-                      })),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  // 垂直靠下
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      // height: 50,
+                      // width: 300,
+                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                        child: TextButton(
+                          //一个凸起的材质矩形按钮
+                            style: TextButton.styleFrom(
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.zero,
+                                  // side: BorderSide(color: Colors.red)
+                                ),
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.black,
+                                minimumSize:
+                                Size(MediaQuery.of(context).size.width - 20, 40)
+                              // elevation: 10,
+                            ),
+                            child: const Text(
+                              '新增紀錄',
+                              style: TextStyle(
+                                  color: Color.fromRGBO(255, 255, 255, 1.0),
+                                  fontSize: 20),
+                            ),
+                            onPressed: () async {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (BuildContext context) {
+                                    return  InsertDataScreen(MEASURE_DT_S1: MEASURE_DT_S, MEASURE_DT_E1: MEASURE_DT_E,);
+                                  }));
+                            })),
+                  ]),
+              const Row(children: <Widget>[
+                Icon(
+                  Icons.favorite,
+                  color: Colors.pink,
+                  size: 28.0,
+                  //semanticLabel: 'Text to announce in accessibility modes',
+                ),
+                Divider(),
+                Text(
+                  '近期數據',
+                  style: TextStyle(fontSize: 28.0, height: 2),
+                )
+              ]),
+              const Builder(),
+              PopScope(
+                canPop: false,
+                onPopInvoked : (didPop){
+                  if (didPop) {
+                    return;
+                  }
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return   const HomeScreen1();
+                      }));
+                  // logic
+                }, child: const Text(''),
+              )
             ]),
-        const Row(children: <Widget>[
-          Icon(
-            Icons.favorite,
-            color: Colors.pink,
-            size: 28.0,
-            //semanticLabel: 'Text to announce in accessibility modes',
-          ),
-          Divider(),
-          Text(
-            '近期數據',
-            style: TextStyle(fontSize: 28.0, height: 2),
-          )
-        ]),
-        const Builder(),
-        PopScope(
-          canPop: false,
-          onPopInvoked : (didPop){
-            if (didPop) {
-              return;
-
-            }
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (BuildContext context) {
-                  return   const HomeScreen1();
-                }));
-            // logic
-          }, child: Text(''),
-        )
-      ]),
+      )
+       : const ListBuilder(),
     );
   }
 }
@@ -180,9 +219,6 @@ class Builder extends StatefulWidget {
 
 class BuilderState extends State<Builder> {
   late Future<dynamic> userDataFuture;
-
-  // final GlobalKey<SfDataGridState> key = GlobalKey<SfDataGridState>();
-
   @override
   void initState() {
     userDataFuture = ApiManager().generateProductList();
@@ -322,107 +358,88 @@ class BuilderState extends State<Builder> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: userDataFuture,
-        // key: key,
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            // print("snapshot.connectionState");
-            if (snapshot.hasData) {
-              return SfDataGrid(
-                  headerRowHeight: 30,
-                  rowHeight: 40,
-                  // allowPullToRefresh: true,
-                  // shrinkWrapRows: true,
-                  // showVerticalScrollbar: true,
-                  // showHorizontalScrollbar: true,
-                  columnWidthMode: ColumnWidthMode.fill,
-                  source: jsonDataGridSource,
-                  columns: getColumns(),
-                  selectionMode: SelectionMode.single,
-                  onCellTap: (DataGridCellTapDetails details) {
-                    TRANSACTION_SEQ1 = jsonDataGridSource
-                        .effectiveRows[details.rowColumnIndex.rowIndex - 1]
-                        .getCells()[1]
-                        .value
-                        .toString();
-                    MEASURE_DT1 = jsonDataGridSource
-                        .effectiveRows[details.rowColumnIndex.rowIndex - 1]
-                        .getCells()[0]
-                        .value
-                        .toString();
-                    //print(jsonDataGridSource.effectiveRows[details.rowColumnIndex.rowIndex - 1].getCells()[1].value.toString());
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return const JsonDataGridView1();
-                    }));
-                  });
-              //Show data here
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 3,
-                ),
-              );
+    return
+      FittedBox(
+        // height: MediaQuery.of(context).size.height ,
+        child: FutureBuilder(
+            future: userDataFuture,
+            // key: key,
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData) {
+                  return SfDataGrid(
+                      highlightRowOnHover: true,
+                      headerRowHeight: 30,
+                      rowHeight: 40,
+                      // allowPullToRefresh: true,
+                      // shrinkWrapRows: true,
+                      showVerticalScrollbar: true,
+                      // showHorizontalScrollbar: true,
+                      columnWidthMode: ColumnWidthMode.fill,
+                      source: jsonDataGridSource,
+                      columns: getColumns(),
+                      selectionMode: SelectionMode.single,
 
-              //Show error here
-            }
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-              ),
-            );
-            //Show progress
-          }
+                      // columnWidthMode: ColumnWidthMode.fill,
+                      // shrinkWrapRows: true,
+                      // rowHeight: 40,
+                      // headerRowHeight: 40,
+                      // source: jsonDataGridSource1,
+                      // columns: getColumns(),
+                      // selectionMode: SelectionMode.single,
+                      // onCellTap: (DataGridCellTapDetails details) {});
 
-          // print("snapshot.data");
-          // print(snapshot.data);
-          // return snapshot.hasData
-          //     ? SfDataGrid(
-          //     allowPullToRefresh: true,
-          //     source: jsonDataGridSource,
-          //     columns: getColumns(),
-          //     selectionMode: SelectionMode.single,
-          //     onCellTap: (DataGridCellTapDetails details) {
-          //       // print(jsonDataGridSource
-          //       //     .effectiveRows[details.rowColumnIndex.rowIndex - 1]
-          //       //     .getCells()[0]
-          //       //     .value
-          //       //     .toString());
-          //       // print(jsonDataGridSource
-          //       //     .effectiveRows[details.rowColumnIndex.rowIndex - 1]
-          //       //     .getCells()[1]
-          //       //     .value
-          //       //     .toString());
-          //       // print(jsonDataGridSource
-          //       //     .effectiveRows[details.rowColumnIndex.rowIndex - 1]
-          //       //     .getCells()[2]
-          //       //     .value
-          //       //     .toString());
-          //       // print(jsonDataGridSource
-          //       //     .effectiveRows[details.rowColumnIndex.rowIndex - 1]
-          //       //     .getCells()[3]
-          //       //     .value
-          //       //     .toString());
-          //     })
-          //     : const Center(
-          //   child: CircularProgressIndicator(
-          //     strokeWidth: 3,
-          //   ),
-          // );
-        });
+
+                      onCellTap: (DataGridCellTapDetails details) {
+                        TRANSACTION_SEQ1 = jsonDataGridSource
+                            .effectiveRows[details.rowColumnIndex.rowIndex - 1]
+                            .getCells()[1]
+                            .value
+                            .toString();
+                        MEASURE_DT1 = jsonDataGridSource
+                            .effectiveRows[details.rowColumnIndex.rowIndex - 1]
+                            .getCells()[0]
+                            .value
+                            .toString();
+                        //print(jsonDataGridSource.effectiveRows[details.rowColumnIndex.rowIndex - 1].getCells()[1].value.toString());
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (BuildContext context) {
+                              return const JsonDataGridView1();
+                            }));
+                      });
+                  //Show data here
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                    ),
+                  );
+
+                  //Show error here
+                }
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                  ),
+                );
+                //Show progress
+              }
+            }),
+      );
+
   }
 }
 
 class ApiManager {
-  // ApiManager(this.MEASURE_DT_S,this.MEASURE_DT_E);
   List<Product> productlist = [];
 
   String now =
       "${DateTime.now().year}-${DateTime.now().month < 10 ? "0${DateTime.now().month}" : DateTime.now().month}-${DateTime.now().day < 10 ? "0${DateTime.now().day}" : DateTime.now().day} 23:59:59";
   String t =
-      "${DateTime.now().subtract(const Duration(days: 180)).year}-${DateTime.now().subtract(const Duration(days: 180)).month < 10 ? "0${DateTime.now().subtract(const Duration(days: 180)).month}" : DateTime.now().subtract(const Duration(days: 180)).month}-${DateTime.now().subtract(const Duration(days: 180)).day < 10 ? "0${DateTime.now().subtract(const Duration(days: 180)).day}" : DateTime.now().subtract(const Duration(days: 180)).day} 00:00:00";
+      "${DateTime.now().year}-${DateTime.now().month < 10 ? "0${DateTime.now().month}" : DateTime.now().month}-01";
+
+  // "${DateTime.now().subtract(const Duration(days: 180)).year}-${DateTime.now().subtract(const Duration(days: 180)).month < 10 ? "0${DateTime.now().subtract(const Duration(days: 180)).month}" : DateTime.now().subtract(const Duration(days: 180)).month}-${DateTime.now().subtract(const Duration(days: 180)).day < 10 ? "0${DateTime.now().subtract(const Duration(days: 180)).day}" : DateTime.now().subtract(const Duration(days: 180)).day} 00:00:00";
 
   Future generateProductList() async {
     List<Login>? result = await DatabaseHelper.getAllNotes();
@@ -495,53 +512,16 @@ class _JsonDataGridSource extends DataGridSource {
     notifyListeners();
   }
 
-// @override
-// DataGridRowAdapter buildRow(DataGridRow row) {
-//   return DataGridRowAdapter(cells: [
-//     Container(
-//       alignment: Alignment.centerRight,
-//       padding: EdgeInsets.all(8.0),
-//       child: Text(
-//         row.getCells()[0].value.toString(),
-//         overflow: TextOverflow.ellipsis,
-//       ),
-//     ),
-//     Container(
-//       alignment: Alignment.centerLeft,
-//       padding: EdgeInsets.all(8.0),
-//       child: Text(
-//         row.getCells()[1].value.toString(),
-//         overflow: TextOverflow.ellipsis,
-//       ),
-//     ),
-//     Container(
-//       alignment: Alignment.centerRight,
-//       padding: EdgeInsets.all(8.0),
-//       child: Text(
-//         row.getCells()[2].value.toString(),
-//         overflow: TextOverflow.ellipsis,
-//       ),
-//     ),
-//     // Container(
-//     //   alignment: Alignment.centerRight,
-//     //   padding: EdgeInsets.all(8.0),
-//     //   child: Text(
-//     //     DateFormat('MM/dd/yyyy').format(row.getCells()[3].value).toString(),
-//     //     overflow: TextOverflow.ellipsis,
-//     //   ),
-//     // ),
-//     Container(
-//       alignment: Alignment.centerRight,
-//       padding: EdgeInsets.all(8.0),
-//       child: Text(
-//         row.getCells()[3].value.toString(),
-//         overflow: TextOverflow.ellipsis,
-//       ),
-//     ),
-//   ]);
-// }
 }
 
+class TextSectionDate extends StatefulWidget {
+  const TextSectionDate({super.key});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _TextSectionDate();
+  }
+}
 class _TextSectionDate extends State<TextSectionDate> {
   DateTime selectedDate = DateTime.now();
   TextEditingController _date = TextEditingController();
@@ -555,27 +535,12 @@ class _TextSectionDate extends State<TextSectionDate> {
     _date_e = TextEditingController(text: MEASURE_DT_E);
   }
 
-  // Future<void> _selectDate(BuildContext context) async {
-  //   final DateTime? picked = await showDatePicker(
-  //       context: context,
-  //       initialDate: selectedDate,
-  //       firstDate: DateTime(2020, 1),
-  //       lastDate: DateTime(2100));
-  //   if (picked != null && picked != selectedDate) {
-  //     setState(() {
-  //       selectedDate = picked;
-  //       // print("${picked.year}-${picked.month}-${picked.day}");
-  //       _date.value = TextEditingValue(
-  //           text:
-  //               "${picked.year}-${picked.month < 10 ? "0${picked.month}" : picked.month}-${picked.day < 10 ? "0${picked.day}" : picked.day}");
-  //     });
-  //   }
-  // }
+
 
   //姓名
   Widget buildNameTextField(TextEditingController controller) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+      margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
       // data: ThemeData(primaryColor: Colors.amber, hintColor: Colors.black),
       child: DateTimeField(
           format: format,
@@ -701,7 +666,7 @@ class _TextSectionDate extends State<TextSectionDate> {
 
   Widget buildNameTextField1(TextEditingController controller) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+      margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
       // data: ThemeData(primaryColor: Colors.amber, hintColor: Colors.black),
       child: DateTimeField(
           format: format,
@@ -783,9 +748,9 @@ class _TextSectionDate extends State<TextSectionDate> {
 //            有聚焦显示颜色跟hintColor，显示在输入框的右边
 //             suffixText: "后缀",
 //               contentPadding: const EdgeInsets.all(5),
-              border: OutlineInputBorder(
+              border: const OutlineInputBorder(
                 // borderRadius: BorderRadius.circular(21.11), //边框裁剪成11.11°角
-                borderSide: const BorderSide(
+                borderSide: BorderSide(
                     color: Colors.black,
                     width: 25.0), //边框颜色、大小没有效果，所以使用返回的是Theme，
               ))),
@@ -795,7 +760,7 @@ class _TextSectionDate extends State<TextSectionDate> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         //主轴Flex的值
         mainAxisSize: MainAxisSize.max,
@@ -810,41 +775,27 @@ class _TextSectionDate extends State<TextSectionDate> {
   }
 }
 
-class TextSectionDate extends StatefulWidget {
-  const TextSectionDate({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _TextSectionDate();
-  }
-}
-
 class JsonDataGridView1 extends StatefulWidget {
   const JsonDataGridView1({super.key});
-
   @override
   createState() => _JsonDataGridView1();
 }
 
 class _JsonDataGridView1 extends State<JsonDataGridView1> {
-  // _JsonDataGridView1(this.TRANSACTION_SEQ);
-  // late String TRANSACTION_SEQ;
-
   final GlobalKey<SfDataGridState> key = GlobalKey<SfDataGridState>();
-
   @override
   void initState() {
     userDataFuture1 = ApiManager1().generateProductList();
     super.initState();
-    // MEASURE_DT1="2024-03-02";
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.cyan,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back,color: Color.fromRGBO(255, 255, 255, 1)),
             onPressed: () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (BuildContext context) {
@@ -852,69 +803,67 @@ class _JsonDataGridView1 extends State<JsonDataGridView1> {
                   }));
             }
         ),
-        title: const Text('生理指標'),
+        title: const Text('生理指標',style: TextStyle(
+            color: Color.fromRGBO(255, 255, 255, 1))),
       ),
-      body: ListView(children: <Widget>[
-
-        PopScope(
-          canPop: false,
-          onPopInvoked : (didPop){
-            if (didPop) {
-              return;
-            }
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (BuildContext context) {
-                  return  JsonDataGrid(Measure_s: MEASURE_DT_S, Measure_e: MEASURE_DT_E,);
-                }));
-            // logic
-          }, child: Text(''),
-        ),
-        const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(
-                Icons.square,
-                color: Colors.deepPurpleAccent,
-                size: 32.0,
-                //semanticLabel: 'Text to announce in accessibility modes',
-              ),
-              Divider(),
-              Text(
-                '個人數據',
-                style: TextStyle(fontSize: 32.0, height: 2),
-              )
-            ]),
-        Row(children: <Widget>[
-          const Icon(
-            Icons.square,
-            color: Colors.deepOrangeAccent,
-            size: 20.0,
-            //semanticLabel: 'Text to announce in accessibility modes',
+      body:
+      Container(
+        color: Color(int.parse("dfe6f0", radix: 16)).withAlpha(255),
+        child: ListView(children: <Widget>[
+          PopScope(
+            canPop: false,
+            onPopInvoked : (didPop){
+              if (didPop) {
+                return;
+              }
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (BuildContext context) {
+                    return  JsonDataGrid(Measure_s: MEASURE_DT_S, Measure_e: MEASURE_DT_E,);
+                  }));
+              // logic
+            }, child: const Divider(height: 0,),
           ),
-          const Divider(),
-          Text(
-            '測量日期:$MEASURE_DT1',
-            style: const TextStyle(fontSize: 20.0, height: 2),
-          )
+          const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.square,
+                  color: Colors.deepPurpleAccent,
+                  size: 32.0,
+                  //semanticLabel: 'Text to announce in accessibility modes',
+                ),
+                Divider(),
+                Text(
+                  '個人數據',
+                  style: TextStyle(fontSize: 32.0, height: 2),
+                )
+              ]),
+          Row(children: <Widget>[
+            const Icon(
+              Icons.square,
+              color: Colors.deepOrangeAccent,
+              size: 20.0,
+              //semanticLabel: 'Text to announce in accessibility modes',
+            ),
+            const Divider(),
+            Text(
+              '測量日期:$MEASURE_DT1',
+              style: const TextStyle(fontSize: 20.0, height: 2),
+            )
+          ]),
+          const BuilderView1(),
+          const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[UpdateButton()]),
         ]),
-        const BuilderView1(),
-        const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[UpdateButton()]),
-      ]),
+      )
+      ,
     );
   }
 }
 
 class BuilderView1 extends StatefulWidget {
   const BuilderView1({super.key});
-
-  // BuilderView1(this.userDataFuture);
-  // late Future<dynamic> userDataFuture;
-
-  // BuilderView1(this.TRANSACTION_SEQ);
-  // late String TRANSACTION_SEQ;
-
   @override
   createState() => BuilderStateView1();
 }
@@ -963,7 +912,6 @@ class BuilderStateView1 extends State<BuilderView1> {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               return SfDataGrid(
-
                   // showVerticalScrollbar: false,
                   // showHorizontalScrollbar: false,
                   // isScrollbarAlwaysShown: true,
@@ -1015,11 +963,20 @@ class ApiManager1 {
     );
     var list = json.decode(response.body).cast<Map<String, dynamic>>();
 
-    productlist =
-        await list.map<Product1>((json) => Product1.fromJson(json)).toList();
-    jsonDataGridSource1 = _JsonDataGridSource1(productlist);
+    productlist = await list.map<Product1>((json) => Product1.fromJson(json)).toList();
 
-    return productlist;
+    List<Product1> productlist1 = [];
+
+    for(Product1 p in productlist){
+      if(p.MEASURE_CODE=="M00008" || p.MEASURE_CODE=="M00009"){
+
+      }else{
+        productlist1.add(p);
+      }
+    }
+
+    jsonDataGridSource1 = _JsonDataGridSource1(productlist1);
+    return productlist1;
   }
 
   Future<List<Product1>> generateProductList1() async {
@@ -1037,15 +994,11 @@ class ApiManager1 {
           <String?, String?>{"field1": s, "field2": TRANSACTION_SEQ1}),
     );
     var list = json.decode(response.body).cast<Map<String, dynamic>>();
-
     productlist = await list.map<Product1>((json) => Product1.fromJson(json)).toList();
-    // jsonDataGridSource1 = _JsonDataGridSource1(productlist);
-
     return productlist;
   }
 
   Future generateProductList2() async {
-
     String? P="";
     List<Product1> productlist = [];
     List<Login>? result = await DatabaseHelper.getAllNotes();
@@ -1063,15 +1016,11 @@ class ApiManager1 {
     var list = json.decode(response.body).cast<Map<String, dynamic>>();
 
     productlist = await list.map<Product1>((json) => Product1.fromJson(json)).toList();
-    // jsonDataGridSource1 = _JsonDataGridSource1(productlist);
-
     if(productlist.isNotEmpty){
       P=productlist[0].PIC;
     }else{
       P="";
     }
-
-
     return P;
   }
 }
@@ -1124,8 +1073,23 @@ class _JsonDataGridSource1 extends DataGridSource {
   }
 }
 
-class UpdateButton extends StatelessWidget {
+
+class UpdateButton extends StatefulWidget {
   const UpdateButton({super.key});
+  @override
+  createState() => _UpdateButton();
+}
+
+class _UpdateButton extends State<UpdateButton> {
+  Future<void> main(BuildContext context) async{
+    ApiManager1 apiManager1 = ApiManager1();
+    var a=await apiManager1.generateProductList2();
+
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (BuildContext context) {
+          return  UpdateDataScreen(imageUrl: a,);
+        }));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1152,20 +1116,15 @@ class UpdateButton extends StatelessWidget {
                         color: Color.fromRGBO(255, 255, 255, 1.0),
                         fontSize: 20),
                   ),
-                  onPressed: () async {
-                    ApiManager1 apiManager1 = ApiManager1();
-                    var a=await apiManager1.generateProductList2();
+                  onPressed: (){
+                    main(context);
+                    // ApiManager1 apiManager1 = ApiManager1();
+                    // var a=await apiManager1.generateProductList2();
+                    // Navigator.pushReplacement(context,
+                    //     MaterialPageRoute(builder: (BuildContext context) {
+                    //   return  UpdateDataScreen(imageUrl: a,);
+                    // }));
 
-                    // print("HHHHHHHHHHHHH");
-                    // String b="";
-                    // print(a.then((value) => b=value));
-
-                    // print(b);
-
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return  UpdateDataScreen(imageUrl: a,);
-                    }));
                     //   // Navigator.pushNamed(context, '/test');
                   }))
         ]);

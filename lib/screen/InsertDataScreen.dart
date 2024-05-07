@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'dart:convert';
 import '../model/login_model.dart';
+import '../partition/LoadingDialog.dart';
 import '../service/login_database_helper.dart';
 import 'JsonDataGrid.dart';
 import 'dart:io';
 import 'UpdateDataScreen.dart';
+import 'package:path/path.dart' as p;
 
 // late String TRANSACTION_SEQ1 = "";
 late StringBuffer buffer = StringBuffer('');
@@ -77,8 +80,10 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.cyan,
           leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back,color: Color.fromRGBO(255, 255, 255, 1)),
               onPressed: () {
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (BuildContext context) {
@@ -89,31 +94,35 @@ class _InsertDataScreenState extends State<InsertDataScreen> {
           // automaticallyImplyLeading: false,
           title: const Text(
             '生理指標',
-            // style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1))
+            style: TextStyle(color: Color.fromRGBO(255, 255, 255, 1))
           ),
         ),
-        body: ListView(
-          children:  [
-            PopScope(
-              canPop: false,
-              onPopInvoked : (didPop){
-                if (didPop) {
-                  return;
-                }
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (BuildContext context) {
-                      return  JsonDataGrid(Measure_s: MEASURE_DT_S2, Measure_e: MEASURE_DT_E2,);
-                    }));
-                // logic
-              }, child: Text(''),
-            ),
+        body:  Container(
+            color: Color(int.parse("dfe6f0", radix: 16)).withAlpha(255),
+            child: ListView(
+            children:  [
+              PopScope(
+                canPop: false,
+                onPopInvoked : (didPop){
+                  if (didPop) {
+                    return;
+                  }
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return  JsonDataGrid(Measure_s: MEASURE_DT_S2, Measure_e: MEASURE_DT_E2,);
+                      }));
+                  // logic
+                }, child: Text(''),
+              ),
 
-            InsertTextSection(),
-            // ImagePickerScreen(),
-            InsertButton(),
-            // ForgetButton()
-          ],
-        ));
+              InsertTextSection(),
+              // ImagePickerScreen(),
+              InsertButton(),
+              // ForgetButton()
+            ],
+          )),
+        )
+        ;
   }
 }
 
@@ -128,8 +137,6 @@ class InsertButton extends StatefulWidget {
 
 //儲存
 class _InsertButtonState extends State<InsertButton> {
-  // const _InsertButtonState({super.key});
-
   @override
   void initState() {
 
@@ -143,7 +150,7 @@ class _InsertButtonState extends State<InsertButton> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           dialogContext = context;
-          return LoadingDialog(true);
+          return const LoadingDialog(true);
         });
   }
 
@@ -304,7 +311,7 @@ class _InsertButtonState extends State<InsertButton> {
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.black,
                     elevation: 0,
-                      minimumSize: Size(MediaQuery.of(context).size.width - 20, 40)
+                      minimumSize: Size(MediaQuery.of(context).size.width - 200, 40)
                   ),
                   child: const Text(
                     '儲存',
@@ -313,6 +320,7 @@ class _InsertButtonState extends State<InsertButton> {
                         fontSize: 20),
                   ),
                   onPressed: () async {
+
                     _checkAccount();
                     if (_accountState) {
                       await _dialogBuilder(context, _checkHint, "A");
@@ -389,6 +397,13 @@ class _InsertTextSectionState extends State<InsertTextSection> {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
+
+      String extension = p.extension(pickedFile!.path);
+      if(extension.trim().toLowerCase() !=".jpg" && extension.trim().toLowerCase() !=".jpeg"){
+        _dialogBuilder(context, "圖片格式須為jpg或jpeg", "X");
+        return;
+      }
+
       _imageFile = File(pickedFile!.path);
     });
   }
@@ -951,6 +966,14 @@ class _InsertTextSectionState extends State<InsertTextSection> {
               TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 14),
             ),
           ),
+          Container(
+            // margin: const EdgeInsets.fromLTRB(0, 0, 100, 0),
+            child: const Text(
+              '心電圖',
+              style:
+              TextStyle(color: Color.fromRGBO(0, 0, 0, 1.0), fontSize: 24),
+            ),
+          ),
           Row(
           children: [
             Row(
@@ -1082,6 +1105,44 @@ Future resp() async {
 
   var DATA = [];
 
+  var logger = Logger(
+    printer: PrettyPrinter(),
+  );
+
+  final requestma = http.MultipartRequest(
+    'POST',
+    Uri.parse('http://140.136.149.212:5000/tf_api/ecg/prediction'),
+  );
+  requestma.files.add(await http.MultipartFile.fromPath(
+    'image',
+    _imageFile!.path,
+  ));
+
+  int str;
+  try{
+    final responsema = await http.Response.fromStream(await requestma.send());
+    if (responsema.statusCode == 200) {
+      if (jsonDecode(responsema.body)["prediction_result"] != null) {
+        str=jsonDecode(responsema.body)["prediction_result"][0][0];
+        flag = "Y";
+      }else{
+        flag = "格式不符";
+        return flag;
+      }
+    } else {
+      flag = "文件傳輸失敗";
+      return flag;
+    }
+  }catch(error){
+    logger.e(error, error: 'Test Error');
+    flag =error.toString();
+    return flag;
+  }
+
+
+
+
+
   List<Login>? result = await DatabaseHelper.getAllNotes();
   String? s=result?[0].account;
 
@@ -1146,7 +1207,7 @@ Future resp() async {
     "MEMBER_ID": s
     , "TRANSACTION_SEQ": timeUnix
     , "MEASURE_CODE": "M00007"
-    , "MEASURE_CODE_GRADE": "0"
+    , "MEASURE_CODE_GRADE": str.toString()
     , "MEASURE_VALUE": 0
     , "UPDATE_BY": s
   });
@@ -1167,70 +1228,65 @@ Future resp() async {
     , "UPDATE_BY": s
   });
   var data = {"DATA": DATA};
-  final String jsonString = jsonEncode(data);
-  // print(jsonString);
-  final response = await http.post(
-    Uri.parse('http://211.20.21.35:8080/fjuheart/MH200101/insert'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      // 'Access-Control-Allow-Origin': '*',
-    },
-    body: jsonString
-    // body: jsonEncode(<String, String>{
-    //   // "EMAIL": EMAIL
-    //   // , "USER_PASSWORD_ENC": userPasswordEnc
-    //   // , "USER_NAME": userName
-    //   // , "TELEPHONE": PHONE
-    //   // EMAIL: $("#EMAIL").val()
-    //   // , USER_PASSWORD_ENC: $("#USER_PASSWORD_ENC").val()
-    //   // , USER_NAME: $("#USER_NAME").val()
-    //   // , TELEPHONE: $("#TELEPHONE").val()
-    // }),
-  );
 
-  if (response.statusCode == 200) {
-    if (jsonDecode(response.body)["RETURNVALUE"] == "Y") {
-      // flag = "Y";
 
-      final request1 = http.MultipartRequest(
-        'POST',
-        Uri.parse('http://211.20.21.35:8080/fjuheart/MH200101/insertattach'),
-      );
-      request1.files.add(await http.MultipartFile.fromPath(
-        'file',
-        _imageFile!.path,
-      ));
-      request1.fields["PARENT_SYS_ID"] = s!;
-      request1.fields["VENDOR_ID"] = timeUnix;
-      request1.fields["MEMO"] = "";
 
-      final response1 = await http.Response.fromStream(await request1.send());
-      if (response1.statusCode == 200) {
-        if (jsonDecode(response1.body)["RETURNVALUE"] == "Y") {
-          flag = "Y";
-        }else{
-          flag = jsonDecode(response.body)["RETURNMSG"];
+  try{
+    final String jsonString = jsonEncode(data);
+    final response = await http.post(
+        Uri.parse('http://211.20.21.35:8080/fjuheart/MH200101/insert'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          // 'Access-Control-Allow-Origin': '*',
+        },
+        body: jsonString
+    );
+
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)["RETURNVALUE"] == "Y") {
+        // flag = "Y";
+
+        final request1 = http.MultipartRequest(
+          'POST',
+          Uri.parse('http://211.20.21.35:8080/fjuheart/MH200101/insertattach'),
+        );
+        request1.files.add(await http.MultipartFile.fromPath(
+          'file',
+          _imageFile!.path,
+        ));
+        request1.fields["PARENT_SYS_ID"] = s!;
+        request1.fields["VENDOR_ID"] = timeUnix;
+        request1.fields["MEMO"] = "";
+
+        final response1 = await http.Response.fromStream(await request1.send());
+        if (response1.statusCode == 200) {
+          if (jsonDecode(response1.body)["RETURNVALUE"] == "Y") {
+            flag = "Y";
+          }else{
+            flag = jsonDecode(response1.body)["RETURNMSG"];
+          }
+        } else {
+          flag = "文件傳輸失敗";
+          return flag;
         }
 
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text('Upload success!')),
-        // );
+
+
+
       } else {
-        flag = "文件傳輸失敗";
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text('Upload failed!')),
-        // );
+        flag = jsonDecode(response.body)["RETURNMSG"];
       }
-
-
-
-
     } else {
-      flag = jsonDecode(response.body)["RETURNMSG"];
+      flag = "連線失敗";
+      return flag;
     }
-  } else {
-    flag = "連線失敗";
+  }catch(error){
+    logger.e(error, error: 'Test Error');
+    flag =error.toString();
+    return flag;
   }
+
+
 
   return flag;
 }
@@ -1281,6 +1337,9 @@ Future<void> _dialogBuilder(BuildContext context, String checkHint, String state
   );
 }
 Future<void> _dialogBuilder2(BuildContext context, String checkHint) {
+
+  late BuildContext dialogContext;
+
   return showDialog<void>(
     context: context,
     builder: (BuildContext context) {
@@ -1300,6 +1359,16 @@ Future<void> _dialogBuilder2(BuildContext context, String checkHint) {
           TextButton(
               onPressed: () async {
                 //送出
+                // _showDialog();
+
+                showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      dialogContext = context;
+                      return const LoadingDialog(true);
+                    });
+
                 var f = await resp();
                 if (f == "Y") {
                   _dialogBuilder1(context, "新增完成");
